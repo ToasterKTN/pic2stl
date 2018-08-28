@@ -29,7 +29,7 @@ pic2stl -ZDivider 0.1 -Input image.png -Output output.stl
 
 Creates from
 
-![input image](https://github.com/ToasterKTN/pic2stl/image.png "Input Image")
+![input image](https://github.com/ToasterKTN/pic2stl/blob/master/image.png?raw=true "Input Image")
 
 An STL like this  (Screenshot)
 
