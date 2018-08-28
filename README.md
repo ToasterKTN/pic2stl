@@ -33,5 +33,5 @@ Creates from
 
 An STL like this  (Screenshot)
 
-![output image](https://github.com/ToasterKTN/pic2stl/screenshot.png "Screenshot Image")
+![output image](https://github.com/ToasterKTN/pic2stl/blob/master/screenshot.png?raw=true "Screenshot Image")
 
