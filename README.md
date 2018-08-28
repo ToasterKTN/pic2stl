@@ -21,6 +21,17 @@ run it with --help to get the Options available
 
 It takes an Image as input and creates a STL File as Output
 
-### Example:
+### Example
 
+```bash 
+pic2stl -ZDivider 0.1 -Input image.png -Output output.stl
+```
+
+Creates from
+
+![input image](https://github.com/ToasterKTN/pic2stl/image.png "Input Image")
+
+An STL like this  (Screenshot)
+
+![output image](https://github.com/ToasterKTN/pic2stl/screenshot.png "Screenshot Image")
 
