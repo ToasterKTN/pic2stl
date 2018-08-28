@@ -21,6 +21,13 @@ run it with --help to get the Options available
 
 It takes an Image as input and creates a STL File as Output
 
+You can set a Resize Factor for Z with -ZDivider
+
+Also ResizeX and ResizeY is available. If only one is set we keep Ratio.
+
+You can Invert black and white with -Invert
+
+
 ### Example
 
 ```bash 
