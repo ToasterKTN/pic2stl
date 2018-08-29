@@ -65,11 +65,11 @@ func main() {
 		oldimg := img
 		img = transform.Resize(oldimg, settings.ResizeX, settings.ResizeY, transform.Linear)
 	}
-	bwimg := effect.Grayscale(img)
 	if settings.Invert {
 		oldimg := img
 		img = effect.Invert(oldimg)
 	}
+	bwimg := effect.Grayscale(img)
 	output.WriteString("solid Converted\n")
 	// Image
 	wg.Add(bwimg.Bounds().Size().X - 1)
