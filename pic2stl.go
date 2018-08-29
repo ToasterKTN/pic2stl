@@ -24,7 +24,7 @@ type Settings struct {
 type Point struct {
 	X int
 	Y int
-	Z int
+	Z float64
 }
 
 var settings Settings
@@ -79,13 +79,13 @@ func main() {
 			defer wg.Done()
 			for y := 1; y < bwimg.Bounds().Size().Y; y++ {
 				lines <- createFacet(
-					Point{x, y, 1 + int(float64(bwimg.GrayAt(x, y).Y)*settings.ZDivider)},
-					Point{x, y - 1, 1 + int(float64(bwimg.GrayAt(x, y-1).Y)*settings.ZDivider)},
-					Point{x - 1, y, 1 + int(float64(bwimg.GrayAt(x-1, y).Y)*settings.ZDivider)})
+					Point{x, y, 1 + float64(bwimg.GrayAt(x, y).Y)*settings.ZDivider},
+					Point{x, y - 1, 1 + float64(bwimg.GrayAt(x, y-1).Y)*settings.ZDivider},
+					Point{x - 1, y, 1 + float64(bwimg.GrayAt(x-1, y).Y)*settings.ZDivider})
 				lines <- createFacet(
-					Point{x - 1, y, 1 + int(float64(bwimg.GrayAt(x-1, y).Y)*settings.ZDivider)},
-					Point{x, y - 1, 1 + int(float64(bwimg.GrayAt(x, y-1).Y)*settings.ZDivider)},
-					Point{x - 1, y - 1, 1 + int(float64(bwimg.GrayAt(x-1, y-1).Y)*settings.ZDivider)})
+					Point{x - 1, y, 1 + float64(bwimg.GrayAt(x-1, y).Y)*settings.ZDivider},
+					Point{x, y - 1, 1 + float64(bwimg.GrayAt(x, y-1).Y)*settings.ZDivider},
+					Point{x - 1, y - 1, 1 + float64(bwimg.GrayAt(x-1, y-1).Y)*settings.ZDivider})
 			}
 		}(x)
 	}
@@ -107,38 +107,38 @@ func main() {
 	for x := 1; x < bwimg.Bounds().Size().X; x++ {
 		lines <- createFacet(
 			Point{x, 0, 0},
-			Point{x - 1, 0, 1 + int(float64(bwimg.GrayAt(x-1, 0).Y)*settings.ZDivider)},
-			Point{x, 0, 1 + int(float64(bwimg.GrayAt(x, 0).Y)*settings.ZDivider)})
+			Point{x - 1, 0, 1 + float64(bwimg.GrayAt(x-1, 0).Y)*settings.ZDivider},
+			Point{x, 0, 1 + float64(bwimg.GrayAt(x, 0).Y)*settings.ZDivider})
 		lines <- createFacet(
 			Point{x, 0, 0},
 			Point{x - 1, 0, 0},
-			Point{x - 1, 0, 1 + int(float64(bwimg.GrayAt(x-1, 0).Y)*settings.ZDivider)})
+			Point{x - 1, 0, 1 + float64(bwimg.GrayAt(x-1, 0).Y)*settings.ZDivider})
 		lines <- createFacet(
 			Point{x, bwimg.Bounds().Size().Y - 1, 0},
-			Point{x, bwimg.Bounds().Size().Y - 1, 1 + int(float64(bwimg.GrayAt(x, bwimg.Bounds().Size().Y-1).Y)*settings.ZDivider)},
-			Point{x - 1, bwimg.Bounds().Size().Y - 1, 1 + int(float64(bwimg.GrayAt(x-1, bwimg.Bounds().Size().Y-1).Y)*settings.ZDivider)})
+			Point{x, bwimg.Bounds().Size().Y - 1, 1 + float64(bwimg.GrayAt(x, bwimg.Bounds().Size().Y-1).Y)*settings.ZDivider},
+			Point{x - 1, bwimg.Bounds().Size().Y - 1, 1 + float64(bwimg.GrayAt(x-1, bwimg.Bounds().Size().Y-1).Y)*settings.ZDivider})
 		lines <- createFacet(
 			Point{x, bwimg.Bounds().Size().Y - 1, 0},
-			Point{x - 1, bwimg.Bounds().Size().Y - 1, 1 + int(float64(bwimg.GrayAt(x-1, bwimg.Bounds().Size().Y-1).Y)*settings.ZDivider)},
+			Point{x - 1, bwimg.Bounds().Size().Y - 1, 1 + float64(bwimg.GrayAt(x-1, bwimg.Bounds().Size().Y-1).Y)*settings.ZDivider},
 			Point{x - 1, bwimg.Bounds().Size().Y - 1, 0})
 	}
 	for y := 1; y < bwimg.Bounds().Size().Y; y++ {
 		lines <- createFacet(
 			Point{0, y, 0},
-			Point{0, y, 1 + int(float64(bwimg.GrayAt(0, y).Y)*settings.ZDivider)},
-			Point{0, y - 1, 1 + int(float64(bwimg.GrayAt(0, y-1).Y)*settings.ZDivider)})
+			Point{0, y, 1 + float64(bwimg.GrayAt(0, y).Y)*settings.ZDivider},
+			Point{0, y - 1, 1 + float64(bwimg.GrayAt(0, y-1).Y)*settings.ZDivider})
 		lines <- createFacet(
 			Point{0, y, 0},
-			Point{0, y - 1, 1 + int(float64(bwimg.GrayAt(0, y-1).Y)*settings.ZDivider)},
+			Point{0, y - 1, 1 + float64(bwimg.GrayAt(0, y-1).Y)*settings.ZDivider},
 			Point{0, y - 1, 0})
 		lines <- createFacet(
 			Point{bwimg.Bounds().Size().X - 1, y, 0},
-			Point{bwimg.Bounds().Size().X - 1, y - 1, 1 + int(float64(bwimg.GrayAt(0, y-1).Y)*settings.ZDivider)},
-			Point{bwimg.Bounds().Size().X - 1, y, 1 + int(float64(bwimg.GrayAt(0, y).Y)*settings.ZDivider)})
+			Point{bwimg.Bounds().Size().X - 1, y - 1, 1 + float64(bwimg.GrayAt(0, y-1).Y)*settings.ZDivider},
+			Point{bwimg.Bounds().Size().X - 1, y, 1 + float64(bwimg.GrayAt(0, y).Y)*settings.ZDivider})
 		lines <- createFacet(
 			Point{bwimg.Bounds().Size().X - 1, y, 0},
 			Point{bwimg.Bounds().Size().X - 1, y - 1, 0},
-			Point{bwimg.Bounds().Size().X - 1, y - 1, 1 + int(float64(bwimg.GrayAt(0, y-1).Y)*settings.ZDivider)})
+			Point{bwimg.Bounds().Size().X - 1, y - 1, 1 + float64(bwimg.GrayAt(0, y-1).Y)*settings.ZDivider})
 	}
 	// Floor
 	centerx := bwimg.Bounds().Size().X / 2
@@ -174,9 +174,9 @@ func main() {
 func createFacet(p1, p2, p3 Point) string {
 	answer := "facet normal 0 0 0\n"
 	answer += "outer loop\n"
-	answer += fmt.Sprintf("vertex %d %d %d \n", p1.X, p1.Y, p1.Z)
-	answer += fmt.Sprintf("vertex %d %d %d \n", p2.X, p2.Y, p2.Z)
-	answer += fmt.Sprintf("vertex %d %d %d \n", p3.X, p3.Y, p3.Z)
+	answer += fmt.Sprintf("vertex %d %d %f.4 \n", p1.X, p1.Y, p1.Z)
+	answer += fmt.Sprintf("vertex %d %d  %f.4\n", p2.X, p2.Y, p2.Z)
+	answer += fmt.Sprintf("vertex %d %d %f.4 \n", p3.X, p3.Y, p3.Z)
 	answer += "endloop\n"
 	answer += "endfacet\n"
 	return answer
