@@ -21,6 +21,12 @@ type Settings struct {
 	Invert   bool
 }
 
+type Point struct {
+	X int
+	Y int
+	Z int
+}
+
 var settings Settings
 
 var wg sync.WaitGroup
@@ -65,38 +71,113 @@ func main() {
 		img = effect.Invert(oldimg)
 	}
 	output.WriteString("solid Converted\n")
+	// Image
 	wg.Add(bwimg.Bounds().Size().X - 1)
 	lines := make(chan string)
 	for x := 1; x < bwimg.Bounds().Size().X; x++ {
 		go func(x int) {
 			defer wg.Done()
 			for y := 1; y < bwimg.Bounds().Size().Y; y++ {
-				var answer = ""
-				answer += "facet normal 0 0 0\n"
-				answer += "outer loop\n"
-				answer += fmt.Sprintf("vertex %d %d %d \n", x, y, uint8(float64(bwimg.GrayAt(x, y).Y)*settings.ZDivider))
-				answer += fmt.Sprintf("vertex %d %d %d \n", x-1, y, uint8(float64(bwimg.GrayAt(x-1, y).Y)*settings.ZDivider))
-				answer += fmt.Sprintf("vertex %d %d %d \n", x, y-1, uint8(float64(bwimg.GrayAt(x, y-1).Y)*settings.ZDivider))
-				answer += "endloop\n"
-				answer += "endfacet\n"
-				answer += "facet normal 0 0 0\n"
-				answer += "outer loop\n"
-				answer += fmt.Sprintf("vertex %d %d %d \n", x-1, y, uint8(float64(bwimg.GrayAt(x-1, y).Y)*settings.ZDivider))
-				answer += fmt.Sprintf("vertex %d %d %d \n", x-1, y-1, uint8(float64(bwimg.GrayAt(x-1, y-1).Y)*settings.ZDivider))
-				answer += fmt.Sprintf("vertex %d %d %d \n", x, y-1, uint8(float64(bwimg.GrayAt(x, y-1).Y)*settings.ZDivider))
-				answer += "endloop\n"
-				answer += "endfacet\n"
-				lines <- answer
+				lines <- createFacet(
+					Point{x, y, 1 + int(float64(bwimg.GrayAt(x, y).Y)*settings.ZDivider)},
+					Point{x, y - 1, 1 + int(float64(bwimg.GrayAt(x, y-1).Y)*settings.ZDivider)},
+					Point{x - 1, y, 1 + int(float64(bwimg.GrayAt(x-1, y).Y)*settings.ZDivider)})
+				lines <- createFacet(
+					Point{x - 1, y, 1 + int(float64(bwimg.GrayAt(x-1, y).Y)*settings.ZDivider)},
+					Point{x, y - 1, 1 + int(float64(bwimg.GrayAt(x, y-1).Y)*settings.ZDivider)},
+					Point{x - 1, y - 1, 1 + int(float64(bwimg.GrayAt(x-1, y-1).Y)*settings.ZDivider)})
 			}
 		}(x)
 	}
 
+	// Add our Lines to the Output File
 	go func() {
-		for a := range lines {
+		for {
+			a := <-lines
+			if a == "quit" {
+				wg.Done()
+				return
+			}
 			output.WriteString(a)
 		}
 	}()
 
 	wg.Wait()
-	output.WriteString("endsolid Converted\n")
+	// Sides
+	for x := 1; x < bwimg.Bounds().Size().X; x++ {
+		lines <- createFacet(
+			Point{x, 0, 0},
+			Point{x - 1, 0, 1 + int(float64(bwimg.GrayAt(x-1, 0).Y)*settings.ZDivider)},
+			Point{x, 0, 1 + int(float64(bwimg.GrayAt(x, 0).Y)*settings.ZDivider)})
+		lines <- createFacet(
+			Point{x, 0, 0},
+			Point{x - 1, 0, 0},
+			Point{x - 1, 0, 1 + int(float64(bwimg.GrayAt(x-1, 0).Y)*settings.ZDivider)})
+		lines <- createFacet(
+			Point{x, bwimg.Bounds().Size().Y - 1, 0},
+			Point{x, bwimg.Bounds().Size().Y - 1, 1 + int(float64(bwimg.GrayAt(x, bwimg.Bounds().Size().Y-1).Y)*settings.ZDivider)},
+			Point{x - 1, bwimg.Bounds().Size().Y - 1, 1 + int(float64(bwimg.GrayAt(x-1, bwimg.Bounds().Size().Y-1).Y)*settings.ZDivider)})
+		lines <- createFacet(
+			Point{x, bwimg.Bounds().Size().Y - 1, 0},
+			Point{x - 1, bwimg.Bounds().Size().Y - 1, 1 + int(float64(bwimg.GrayAt(x-1, bwimg.Bounds().Size().Y-1).Y)*settings.ZDivider)},
+			Point{x - 1, bwimg.Bounds().Size().Y - 1, 0})
+	}
+	for y := 1; y < bwimg.Bounds().Size().Y; y++ {
+		lines <- createFacet(
+			Point{0, y, 0},
+			Point{0, y, 1 + int(float64(bwimg.GrayAt(0, y).Y)*settings.ZDivider)},
+			Point{0, y - 1, 1 + int(float64(bwimg.GrayAt(0, y-1).Y)*settings.ZDivider)})
+		lines <- createFacet(
+			Point{0, y, 0},
+			Point{0, y - 1, 1 + int(float64(bwimg.GrayAt(0, y-1).Y)*settings.ZDivider)},
+			Point{0, y - 1, 0})
+		lines <- createFacet(
+			Point{bwimg.Bounds().Size().X - 1, y, 0},
+			Point{bwimg.Bounds().Size().X - 1, y - 1, 1 + int(float64(bwimg.GrayAt(0, y-1).Y)*settings.ZDivider)},
+			Point{bwimg.Bounds().Size().X - 1, y, 1 + int(float64(bwimg.GrayAt(0, y).Y)*settings.ZDivider)})
+		lines <- createFacet(
+			Point{bwimg.Bounds().Size().X - 1, y, 0},
+			Point{bwimg.Bounds().Size().X - 1, y - 1, 0},
+			Point{bwimg.Bounds().Size().X - 1, y - 1, 1 + int(float64(bwimg.GrayAt(0, y-1).Y)*settings.ZDivider)})
+	}
+	// Floor
+	centerx := bwimg.Bounds().Size().X / 2
+	centery := bwimg.Bounds().Size().Y / 2
+	for x := 1; x < bwimg.Bounds().Size().X; x++ {
+		lines <- createFacet(
+			Point{x, 0, 0},
+			Point{centerx, centery, 0},
+			Point{x - 1, 0, 0})
+		lines <- createFacet(
+			Point{x, bwimg.Bounds().Size().Y - 1, 0},
+			Point{x - 1, bwimg.Bounds().Size().Y - 1, 0},
+			Point{centerx, centery, 0})
+	}
+	for y := 1; y < bwimg.Bounds().Size().Y; y++ {
+		lines <- createFacet(
+			Point{0, y, 0},
+			Point{0, y - 1, 0},
+			Point{centerx, centery, 0})
+		lines <- createFacet(
+			Point{bwimg.Bounds().Size().X - 1, y, 0},
+			Point{centerx, centery, 0},
+			Point{bwimg.Bounds().Size().X - 1, y - 1, 0})
+	}
+	lines <- "endsolid Converted\n"
+
+	// Wait for all the Lines to be written.. Maybe unneeded but i dont know.
+	wg.Add(1)
+	lines <- "quit"
+	wg.Wait()
+}
+
+func createFacet(p1, p2, p3 Point) string {
+	answer := "facet normal 0 0 0\n"
+	answer += "outer loop\n"
+	answer += fmt.Sprintf("vertex %d %d %d \n", p1.X, p1.Y, p1.Z)
+	answer += fmt.Sprintf("vertex %d %d %d \n", p2.X, p2.Y, p2.Z)
+	answer += fmt.Sprintf("vertex %d %d %d \n", p3.X, p3.Y, p3.Z)
+	answer += "endloop\n"
+	answer += "endfacet\n"
+	return answer
 }
